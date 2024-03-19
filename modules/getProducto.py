@@ -1,4 +1,5 @@
 import os
+import re
 from tabulate import tabulate
 import requests
 
@@ -7,18 +8,23 @@ import requests
 # mostrando en primer lugar los de mayor precio.
 def getAllData():
     # json-server storage/producto.json -b 5501
-    peticion = requests.get("http://172.16.102.108:5501")
+    peticion = requests.get("http://172.16.102.108:5501/productos")
     data = peticion.json()
     return data
 
+def getProductCodigo(codigo):
+    peticion = requests.get(f"http://172.16.102.108:5501/productos/{codigo}")
+    return [peticion.json()] if peticion.ok else []
+    # if(peticion.ok):
+    #     return [peticion.json()]
+    # else:
+    #     return []
+   
+
 def getAllStocksPriceGama(gama, stock):
-    condiciones = []
-    for val in getAllData():
-        if(val.get("gama") == gama and val.get("cantidad_en_stock") >= stock):
-            condiciones.append(val)
-    def price(val):
-        return val.get("precio_venta")    
-    condiciones.sort(key=price, reverse=True)
+    peticion = requests.get(f"http://154.38.171.54:5008/productos?gama={gama}&cantidadEnStock_gte={stock}&_sort=-precio_venta")
+    condiciones = peticion.json()
+
     for i, val in enumerate(condiciones):
         condiciones[i] = {
                 "codigo": val.get("codigo_producto"),
@@ -48,11 +54,15 @@ def menu():
             0. Atras
           
           """)        
-        opcion = int(input("\nSelecione una de las opciones: "))
-        if(opcion == 1):
-            gama = input("Ingrese la gama que deseas flictrar: ")
-            stock = int(input("Ingrese las unidades que seas mostrar: "))
-            print(tabulate(getAllStocksPriceGama(gama, stock), headers="keys", tablefmt="github"))
-        elif(opcion == 0):
-            break
+        opcion = input("\nSelecione una de las opciones: ")
+        if(re.match(r'[0-9]+$', opcion) is not None):
+            opcion = int(opcion)
+            if(opcion>=0 and opcion<=1):
+                if(opcion == 1):
+                    gama = input("Ingrese la gama que deseas flictrar: ")
+                    stock = int(input("Ingrese las unidades que seas mostrar: "))
+                    print(tabulate(getAllStocksPriceGama(gama, stock), headers="keys", tablefmt="github"))
+                    input("Precione una tecla para continuar.....")
+                elif(opcion == 0):
+                    break
 

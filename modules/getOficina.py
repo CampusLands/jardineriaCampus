@@ -1,10 +1,19 @@
-import storage.oficina as of
+import requests
+import json
+
+# import storage.oficina as of
+def getAll():
+    peticion = requests.get("http://154.38.171.54:5005/oficinas")
+    data = peticion.json()
+    return data
+
+
 # Devuelve un listado con el código de 
 # oficina y la ciudad donde hay oficinas.
 
 def getAllCodigoCiudad():
     codigoCiudad = []
-    for val in of.oficina:
+    for val in getAll():
         codigoCiudad.append({
             "código": val.get("codigo_oficina"),
             "ciudad": val.get("ciudad")
@@ -16,7 +25,7 @@ def getAllCodigoCiudad():
 
 def getAllCiudadTelefono(pais):
     ciudadTelefono = []
-    for val in of.oficina:
+    for val in getAll():
         if(val.get("pais") == pais):
             ciudadTelefono.append({
                 "ciudad": val.get("ciudad"),

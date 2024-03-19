@@ -1,9 +1,16 @@
+import requests
+import json
 from tabulate import tabulate
-import storage.cliente as cli
+
+
+def getAll():
+    peticion = requests.get("http://154.38.171.54:5001/cliente")
+    data = peticion.json()
+    return data
 
 def getAllClientName():
     clienteName = list()
-    for val in cli.clientes:
+    for val in getAll():
         codigoName = dict({
             "codigo": val.get('codigo_cliente'),
             "nombre": val.get('nombre_cliente')
@@ -12,7 +19,7 @@ def getAllClientName():
     return clienteName
 
 def getOneClientCodigo(codigo):
-    for val in cli.clientes:
+    for val in getAll():
         if(val.get('codigo_cliente') == codigo):
             return [{
                 "codigo": val.get('codigo_cliente'),
@@ -21,7 +28,7 @@ def getOneClientCodigo(codigo):
 
 def getAllClientCreditCiudad(limiteCredit, ciudad):
     clienteCredic = list()
-    for val in cli.clientes:
+    for val in getAll():
         if(val.get('limite_credito') >= limiteCredit and val.get('ciudad') == ciudad):
             clienteCredic.append({
                 "Codigo": val.get('codigo_cliente'),
@@ -85,7 +92,7 @@ def menu():
 
 # def getAllClientPaisRegionCiudad(pais, region=None, ciudad=None):
 #     clientZone = list()
-#     for val in cli.clientes:
+#     for val in getAll():
 #         if(val.get('pais') == pais):
             
 #             if((region != None or val.get('region') == region)):

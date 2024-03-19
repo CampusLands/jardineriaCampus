@@ -1,10 +1,18 @@
-import storage.empleado as em
+import requests
+import json
+
+
+def getAll():
+    peticion = requests.get("http://154.38.171.54:5003/empleados")
+    data = peticion.json()
+    return data
+
 # Devuelve un listado con el nombre, apellidos y email 
 # de los empleados cuyo jefe tiene un código de jefe igual a 7.
 
 def getAllNombreApellidoEmailJefe(codigo):
     nombreApellidoEmail = []
-    for val in em.empleados:
+    for val in getAll():
         if(val.get("codigo_jefe") == codigo):
             nombreApellidoEmail.append(
                 {
